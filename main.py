@@ -17,7 +17,7 @@ segmentacion vacia. Esta se ira llenando segun se procesen instrucciones.
 """
 
 from lib_bits import sign_extend_16_32
-from datapath import MIPS32PipelineCPU
+from segmentacion import MIPS32PipelineCPU
 
 if __name__ == "__main__":
     cpu = MIPS32PipelineCPU()
