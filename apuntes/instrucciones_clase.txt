@@ -1,0 +1,27 @@
+class segmentacion:
+    IF
+    ID
+    EX
+    MEM 
+    WB 
+un __init__ que asigne cada fase a la clase segmentacion
+
+metodo simulate (recordar que cada fase trabaja en un cuanto de tiempo solo ocupan la mitad de la fase por lo general)
+
+def simulate():
+    while not fin:
+    # empezamos con WB porque Ex, Mem, WB empiezan escribiendo y por ello ocupan la primera mitad del ciclo
+        wb(): escribo en los registros, recibo MEM/WB
+        ex(): guardo la Salida en una variable temporal, cuando mem termine actualizare ex/mem con el contenido de aux
+        mem():  usara ex/mem (registro) para 
+        id(): recibe IF/ID ->
+        if(): recibe PC -> guarda la instruccion parseada en IF/ID
+
+        # cada registro intermedio es una clase con sus atributos especificos.
+            registro IF/ID: Instruccion y PC
+            ID/EX: instruccion troceada (tipo de instruccion, reg1, reg2, regCode1, regCode2, etiqueta, Offset, rd, result=null)
+                    reg1 y reg2 son el contenido
+            EX/MEM: reg1, reg2, tipo, Offset, regDest, Vf (Vf es el contenido de RegDest)
+            Mem/WB: tipoInstr, ,regDest, Vf
+                    Como se ejecutan en el orden de arriba, necesitamos informacion adicional en los registros para los cortocircuitos
+                    Por eso Mem/Wb tiene la informacion, para los cortocircuitos.
