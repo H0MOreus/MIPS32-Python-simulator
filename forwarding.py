@@ -5,14 +5,14 @@ from pipeline_regs import IF_ID_Register, ID_EX_Register, EX_MEM_Register
 
 
 class ForwardingUnit:
-    """
-      - id_ex          : Registro ID/EX; instrucción actual en EX (I3).
+    """ 
+      - id_ex          : Registro ID/EX; instruccion actual en EX (I3).
       - ex_mem         : Registro EX/MEM; instruccion anterior (I2).
       - wb_reg_write   : Signal RegWrite (0 o 1); retenida de WB en el Paso 1 (I1).
       - wb_write_reg   : Registro destino (0..31) retenido de WB en el Paso 1 (I1).
       - wb_write_data 
     """
-
+    
     NO_FORWARD  = 0b00  
     FROM_MEM_WB = 0b01  
     FROM_EX_MEM = 0b10  
@@ -66,10 +66,11 @@ class ForwardingUnit:
 
     """        
         Returj: una tupla con 3 valores de 32 bits;
-          1. alu_in_a         : Operando A definitivo para la ALU.
-          2. alu_in_b         : Operando B definitivo para la ALU (tras pasar por el mux ALUSrc).
+          1. alu_in_a         : Operando A entrante en ALU.
+          2. alu_in_b         : Operando B entrante en ALU (mux ALUSrc).
           3. rt_value_for_sw  : Valor actualizado del registro rt (para guardar en memoria si es 'sw').
     """
+    
     def select_alu_operands(
         self,
         id_ex: ID_EX_Register,
@@ -119,7 +120,7 @@ class HazardDetectionUnit:
         self.load_use_stall = False
 
     """
-    Determina si la instrucción en EX es un 'beq' o 'bne'
+    Determina si la instruccion en EX es un 'beq' o 'bne'
     """
     @staticmethod
     def is_branch_taken_in_ex(id_ex: ID_EX_Register, alu_zero: bool) -> bool:
@@ -135,24 +136,36 @@ class HazardDetectionUnit:
     """
     @staticmethod
     def _get_read_registers_in_id(instr: int) -> Tuple[bool, bool, int, int]:
-
         if instr == 0x00000000:
             return False, False, 0, 0
 
         opcode = get_bits(instr, 31, 26)
         rs = get_bits(instr, 25, 21)
         rt = get_bits(instr, 20, 16)
+        funct = get_bits(instr, 5, 0)
 
-        # El salto incondicional 'j' no lee ningún registro
-        if opcode == ControlUnit.OP_J:
+        # 'syscall' no lee ningun registro: solo detiene la simulacion
+        if opcode == ControlUnit.OP_RTYPE and funct == 0x0C:
+            return False, False, 0, 0
+
+        # 'j' y 'lui' no leen registros fuente
+        if opcode in (ControlUnit.OP_J, ControlUnit.OP_LUI):
             return False, False, rs, rt
 
-        # 'addi' y 'lw' solo leen 'rs' (en ellas 'rt' es el registro donde escribirán en WB)
-        if opcode in (ControlUnit.OP_ADDI, ControlUnit.OP_LW):
+        # Instrucciones Tipo-I que solo leen 'rs' (escriben en 'rt')
+        if opcode in (
+            ControlUnit.OP_ADDI,
+            ControlUnit.OP_ADDIU,
+            ControlUnit.OP_ORI,
+            ControlUnit.OP_LW,
+            ControlUnit.OP_LBU,
+            ControlUnit.OP_LB,
+        ):
             return True, False, rs, rt
 
-        # Tipo-R, 'sw', 'beq' y 'bne' leen tanto 'rs' como 'rt'
+        # Tipo-R, 'sw', 'sb', 'beq' y 'bne' leen tanto 'rs' como 'rt'
         return True, True, rs, rt
+
 
     """
     Si la instruccion anterior es 'lw', se compara el rd de I-1 con el rs/rt de I

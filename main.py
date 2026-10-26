@@ -1,56 +1,106 @@
-"""
-1) Se desea la creacion de una simulacion de segmentacion de instrucciones
-mediante Python. Esta simulacion debe ser intuitiva y facil de seguir. No es
-necesario que sea grafica y visual, puede ser por consola, pero debera ser lo
-suficientemente explicativa: estado actual de los registros contador del
-programa, registro de instruccion, informacion en registros, caminos utilizados
-por cada instruccion en cada fase de la segmentacion, etc. Asi el programa debe
-indicar en cada momento la etapa y lugares del camino de datos que realizan
-cada tarea especifica para las instrucciones a procesar.
+import argparse
+import sys
+from pathlib import Path
+from typing import Optional
 
-2) Se deben utilizar estructuras de datos adecuadas para el correcto
-funcionamiento de la simulacion. Ademas, debera utilizarse programacion
-orientada a objetos para proporcionar la adecuada abstraccion.
-
-3) La inicializacion del sistema debe presentar la cadena de montaje de la
-segmentacion vacia. Esta se ira llenando segun se procesen instrucciones.
-"""
-
-from lib_bits import sign_extend_16_32
+from ensamblador import MIPS32Assembler, AssemblerSyntaxError
 from segmentacion import MIPS32PipelineCPU
+from memorias import Memory, HarwareMemException, AlignmentError, SegmentationFault
 
-if __name__ == "__main__":
+DEFAULT_CANDIDATE_PATHS = [
+    Path("./instrucciones/instruction.txt"),
+    Path("./instrucciones/instruction.asm"),
+]
+
+
+def resolve_instruction_file(custom_path: Optional[str] = None) -> Path:
+    if custom_path:
+        target = Path(custom_path)
+        if not target.is_file():
+            raise FileNotFoundError(f"No se encontro el archivo indicado: '{target}'")
+        return target
+
+    script_dir = Path(__file__).resolve().parent
+    for rel_path in DEFAULT_CANDIDATE_PATHS:
+        if rel_path.is_file():
+            return rel_path
+        alt_path = script_dir / rel_path
+        if alt_path.is_file():
+            return alt_path
+
+    raise FileNotFoundError("No se encontro ningun archivo en ./instrucciones/")
+
+
+def format_stage(stage_snap: dict, source_map: dict[int, str]) -> str:
+    if not stage_snap["valid"]:
+        return "[BURBUJA / NOP]"
+    pc_int = int(stage_snap["data"]["pc"], 16)
+    asm = source_map.get(pc_int, stage_snap["data"]["pc"])
+    stall_tag = " (STALL)" if stage_snap["stalled"] else ""
+    return f"0x{pc_int:08X}: {asm}{stall_tag}"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Simulador MIPS32 segmentado de 5 etapas.")
+    parser.add_argument("program", nargs="?", default=None, help="Ruta al archivo .txt o .asm")
+    parser.add_argument("--max-cycles", type=int, default=5000, help="Limite de ciclos")
+    parser.add_argument("--quiet", action="store_true", help="Oculta la traza ciclo a ciclo")
+    args = parser.parse_args()
+
+    try:
+        source_path = resolve_instruction_file(args.program)
+        source_code = source_path.read_text(encoding="utf-8")
+    except (FileNotFoundError, OSError) as err:
+        print(f"[ERROR DE ARCHIVO] {err}", file=sys.stderr)
+        return 1
+
+    print(f"Archivo fuente cargado: {source_path}")
+
+    assembler = MIPS32Assembler(base_address=Memory.TEXT_BASE)
+    try:
+        machine_words, symbols, listing = assembler.assemble_with_listing(source_code)
+    except AssemblerSyntaxError as err:
+        print(f"[ERROR DE ENSAMBLADO] {err}", file=sys.stderr)
+        return 1
+
     cpu = MIPS32PipelineCPU()
+    cpu.load_program(
+        machine_words=machine_words,
+        base_address=Memory.TEXT_BASE,
+        data_bytes=assembler.data_image,
+    )
 
-    # Base de .data = 0x10000000. Pre-cargamos $s0 ($16) con 0x10000000 para direccionar .data
-    cpu.regs.write(16, 0x10000000, reg_write=True)
+    try:
+        while not cpu.is_halted() and cpu.cycle_count < args.max_cycles:
+            snap = cpu.step_cycle()
+            if not args.quiet:
+                print(
+                    f"[Ciclo {snap['cycle']:03d}] PC={snap['pc']} | "
+                    f"FwdA={snap['ForwardA']} FwdB={snap['ForwardB']} | "
+                    f"Stall={snap['load_use_stall']} Branch={snap['branch_taken']} "
+                    f"SyscallHalt={snap['halted_by_syscall']}"
+                )
+                for st_name in ("MEM/WB", "EX/MEM", "ID/EX", "IF/ID"):
+                    print(f"  {st_name:<6}: {format_stage(snap['stages'][st_name], assembler.source_map)}")
+    except (HarwareMemException, AlignmentError, SegmentationFault) as err:
+        print(f"\n[EXCEPCION DE MEMORIA en ciclo {cpu.cycle_count}] {err}", file=sys.stderr)
+        return 1
 
-    # Programa en código máquina MIPS32:
-    # 1. addi $t0, $zero, 25      -> 0x20080019 ($t0 = 25)
-    # 2. addi $t1, $t0, 15        -> 0x2109000F ($t1 = $t0 + 15 = 40) [Riesgo EX/MEM en $t0]
-    # 3. sw   $t1, 0($s0)         -> 0xAE090000 (MEM[0x10000000] = $t1 = 40) [ForwardB en sw]
-    # 4. lw   $t2, 0($s0)         -> 0x8E0A0000 ($t2 = MEM[0x10000000] = 40)
-    # 5. add  $t3, $t2, $t0       -> 0x01485820 ($t3 = $t2 + $t0 = 65) [Riesgo Load-Use en $t2!]
-    # 6. beq  $t1, $t2, +1        -> 0x112A0001 (Como $t1 == $t2 == 40, salta 1 instr adelante)
-    # 7. addi $t4, $zero, 999     -> 0x200C03E7 (Debe ser ANULADA por el flush del beq)
-    # 8. addi $t5, $t3, 5         -> 0x216D0005 ($t5 = $t3 + 5 = 70) [Destino del salto beq]
-    program = [
-        0x20080019,
-        0x2109000F,
-        0xAE090000,
-        0x8E0A0000,
-        0x01485820,
-        0x112A0001,
-        0x200C03E7,
-        0x216D0005,
-    ]
-
-    cpu.load_program(program)
-    traces = cpu.run()
-
+    print("\n" + "=" * 70)
     print(f"Ciclos totales ejecutados : {cpu.cycle_count}")
     print(f"Instrucciones retiradas   : {cpu.instructions_retired}")
     print(f"Paradas Load-Use (stalls) : {cpu.load_use_stalls}")
     print(f"Vaciados por Branch       : {cpu.branch_flushes}")
-    print("Estado final de registros :", cpu.regs.dump(cond=True))
-    print(f"Valor en .data[0x10000000]: {cpu.memory.read_word(0x10000000)}")
+    print(f"Vaciados por Jump         : {cpu.jump_flushes}")
+    print(f"Detenido por Syscall      : {cpu.halted_by_syscall}")
+    print(f"Estado final de registros : {cpu.regs.dump(cond=True)}")
+
+    if "input" in symbols and "output" in symbols:
+        print(f"Cadena input  (.data)     : \"{cpu.memory.read_asciiz(symbols['input'])}\"")
+        print(f"Cadena output (.data)     : \"{cpu.memory.read_asciiz(symbols['output'])}\"")
+    print("=" * 70)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -129,7 +129,9 @@ class MEM_WB_Register(PipelineRegister):
     def _default_data(self) -> Dict[str, int]:
         return {
             "pc": 0x00000000,
-            "read_data": 0x00000000,        # Palabra de .data en 'lw'
+            "read_data": 0x00000000,
+            "mem_read_data": 0x00000000,        # Palabra de .data en 'lw'
             "alu_result": 0x00000000,       # Resultado de la ALU adelantado hacia WB
-            "rd": 0,                        # registro destino
+            "rd": 0,
+            "write_reg": 0,                        # registro destino
         }

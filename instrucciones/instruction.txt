@@ -54,4 +54,4 @@ fin_cadena:
 end_main:
 # no usaremos subrutas, solo simulare terminacion de programa.
 	li   $v0, 10			# Salida del programa
-	syscall
+	syscall	

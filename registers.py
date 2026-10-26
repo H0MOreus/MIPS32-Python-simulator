@@ -12,6 +12,9 @@ class RegisterFile:
     """
     Banco de 32 registros de 32 bits.
     Inicializados a 0, $zero no cambia
+    Convenio MIPS Calling Convention
+    Obviamente no usamos todos
+    https://shell-storm.org/abi/#mips
     """
 
     NAMES: Dict[str, int] = {

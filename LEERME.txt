@@ -1,0 +1,19 @@
+            LEERME
+Despues de las muchas, muchas horas de trabajo.
+He decidido que voy a publicar el proyecto en gitHub.
+A medio camino de terminarlo, me he dado cuenta que aunque este usando terminologia inglesa,
+el proyecto sera evaluado en castellano.
+Por ello hay nombres de funciones comentadas en ingles.
+
+GUIDELINES:
+
+Para cualquiera que lea mis comentarios en el proyecto:
+- No uso tildes, ni el caracter 'ñ'
+    No son errores ortograficos, es una decision de estilo, no todos los sistemas 
+    entienden los caracteres especiales. (Yo tampoco los entiendo)
+    Uso reiterado la palabra 'signal' para no decir señal.
+- He intentado que los comentarios demuestren mi conocimiento y mi linea de razonamiento detras del codigo
+    No son comentarios tecnicos que explican como debe de usarse las funciones
+- Es una simulacion de un sistema, no una emulacion completa.
+- He intentado hacerlo lo mas 'C like' posible si ese termino existe.
+- Espero no tener que hacer algo parecido, pronto.

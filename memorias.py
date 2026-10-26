@@ -110,3 +110,21 @@ class Memory:
             struct.pack_into(">I", self._text, offset, to_unsigned32(word))
             addr += 4  
         
+    def load_data_bytes(self, raw_bytes: bytes | bytearray, base_address: int = DATA_BASE) -> None:
+        # 
+        addr = to_unsigned32(base_address)
+        end = addr + len(raw_bytes)
+        if not (self.DATA_BASE <= addr and end <= (self.DATA_BASE + self.DATA_SIZE)):
+            raise SegmentationFault("Overflow .data.")
+        offset = addr - self.DATA_BASE
+        self._data[offset : offset + len(raw_bytes)] = raw_bytes
+
+    def read_asciiz(self, address: int, max_len: int = 256) -> str:
+        # decidi usar la directiva .ASCIIZ........
+        chars: list[int] = []
+        for i in range(max_len):
+            b = self.read_byte(address + i, signed=False)
+            if b == 0:
+                break
+            chars.append(b)
+        return bytes(chars).decode("utf-8", errors="replace")

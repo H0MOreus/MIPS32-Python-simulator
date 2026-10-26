@@ -1,0 +1,274 @@
+\documentclass[12pt,a4paper,twoside,openright]{report}
+
+% ==========================================
+% PAQUETES ESENCIALES
+% ==========================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-nodecimaldot,es-tabla]{babel} % es-tabla usa "Tabla" en vez de "Cuadro"
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{microtype} % Mejora la justificacion tipografica
+\usepackage{csquotes}
+\usepackage[most]{tcolorbox}
+
+
+% Configuracion de margenes para encuadernacion (impresion a doble cara)
+\usepackage[top=2.5cm, bottom=2.5cm, inner=3.0cm, outer=2.0cm]{geometry}
+
+% Interlineado estandar (1.2 o 1.5 segun normativa universitaria)
+\usepackage{setspace}
+\onehalfspacing
+
+% Formato de encabezados y pies de pagina
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\nouppercase{\leftmark}}   % Titulo de capitulo en paginas pares
+\fancyhead[RO]{\nouppercase{\rightmark}}  % Titulo de seccion en paginas impares
+\fancyfoot[C]{\thepage}                  % Numero de pagina centrado abajo
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Gestión de enlaces y metadatos del PDF
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Definición de colores
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% Configuración del estilo para Python
+\lstdefinestyle{estilopython}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    % 
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    language=Python
+}
+
+\lstset{style=estilopython}
+
+% Gestion de bibliografia con BibLaTeX
+% Configuración correcta para APA en español:
+\usepackage[
+    backend=biber,
+    style=apa
+]{biblatex}
+\DeclareLanguageMapping{spanish}{spanish-apa}
+
+\addbibresource{referencias.bib}
+
+% ==========================================
+% MACROS Y PAGINAS EN BLANCO LIMPIAS
+% ==========================================
+% Comando para forzar pagina par en blanco sin encabezados ni numeros
+\newcommand{\clearemptydoublepage}{%
+  \clearpage
+  {\pagestyle{empty}\cleardoublepage}%
+}
+
+% ==========================================
+% CUERPO DEL DOCUMENTO
+% ==========================================
+\begin{document}
+
+% --------------------------------------------------
+% PORTADA
+% --------------------------------------------------
+\begin{titlepage}
+  \thispagestyle{empty}
+  \centering
+
+  \vspace*{1cm}
+  \includegraphics[width=0.15\textwidth]{~/Universidad/IF/4/AAC/PRACTICAS/URJ_simbolo_POS_1.png}\\[1cm]
+  {\Large \textbf{UNIVERSIDAD REY JUAN CARLOS}}\\[0.3cm]
+  {\large Escuela Técnica Superior de Ingeniería Informática}\\[2cm]
+    
+  {\large \textbf{Arquitecturas Avanzadas de Computadores}}\\[0.8cm]
+  {\Huge \textbf{Memoria 1}}\\[1cm]
+  {\large Grado en Ingeniería Informática}\\[2.5cm]
+
+  \begin{flushleft}
+    \textbf{Autor:} Angel Petrovan\\
+    \textbf{Convocatoria:} Julio 2026\\
+    \textbf{DNI:} Y1575813M
+  \end{flushleft}
+
+  \vfill
+  {\small Madrid, Septiembre, 2026}
+\end{titlepage}
+
+% Hoja en blanco tras la portada
+\clearemptydoublepage
+
+% --------------------------------------------------
+% ÍNDICES
+% --------------------------------------------------
+\tableofcontents
+\clearemptydoublepage
+
+\listoffigures
+\clearemptydoublepage
+
+%\listoftables
+%\clearemptydoublepage
+
+% --------------------------------------------------
+% CONTENIDO PRINCIPAL (Numeracion arabiga y encabezados)
+% --------------------------------------------------
+\pagenumbering{arabic}
+\pagestyle{fancy}
+
+% Capitulo 1
+\chapter{Introducción}
+\label{cap:introduccion}
+Para la primera practica de la asignatura recordamos los conceptos basicos de Python y lo complementamos con una lectura sobre distintas herramientas y programas que ayudar a la paralelizacion de la computacion en python.
+
+\section{Objetivos}
+Para esta segunda practica, posterior a la lectura del \emph{GPUS AND THE FUTURE OF PARALLEL COMPUTING}
+El objetivo es familiarizarse con el entorno de desarrollo software, el lenguaje Latex, y Python.
+
+\section{Estructura de la Memoria}
+Por la naturaleza misma de esta practica solo habrán 3 Capitulos (incluido este), uno dedicado a la lectura del articulo \emph{"Parallel distributed computing using Python"}, para recordar... de Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler y Alejandro Cosimo.
+Y de un pequeño y educativo codigo que simula el funcionamiento de un supermercado.
+% Capitulo 2
+\chapter{Propuesta}
+\section{Arquitectura Echelon}
+\label{cap:resumen}
+
+La ley de Moore, una coyuntura de más de 50 años de duración llegaba a su final sobre la década de los 2010. No atendía a razones físicas ni lógicas, simplemente al avance científico de genios que impulsaron exponencialmente los límites de la computación.
+Pero era una ley que se veía que no podía mantenerse para siempre, en aquella época los límites físicos se creían muy cercanos. Por este motivo y por diversos factores políticos-económicos, el gobierno estadounidense, se decidió a financiar un estudio sobre el futuro de la computación.
+\smallskip
+
+Las aplicaciones de aquella época estaban demandando, cada vez más, potencia gráfica, y para renderizar gráficos lo mejor siempre será usar hardware dedicado.
+Las GPUs, cada vez más potentes y cada vez más económicas, no solucionaron el problema de la demanda, sino que lo acrecentó, los estándares de los consumidores crecieron y los programas por tanto requerían más potencia grafica.
+Además, en el ámbito académico y profesional nuevas tecnologías, nuevas teorías y modelos, también requieren más y mejor potencia.
+Pero los límites de la computación ya no los marcaban los procesadores o las tarjetas gráficas, sino la memoria y la eficiencia energética.
+\smallskip
+
+La mejor técnica para aumentar el número de instrucciones en ejecución por unidad de tiempo es el paralelismo. El paralelismo requiere poder realizar varias operaciones en el mismo instante de tiempo, para ello se necesita un sistema capaz de procesar y operar concurrentemente. Forzando la existencia de varias unidades funcionales.
+Destacando las GPU, unidades de cientos, sino miles de núcleos, operando a la vez para darle color a cada pixel de una pantalla, o para realizar millones de cálculos que llevarían horas a los procesadores normales.
+Nvidia se ha posicionado como referente en el mundo de las GPUs en parte por la creación de CUDA, una librería libre con una interfaz que ayuda a aprovechar al máximo las prestaciones de cada tarjeta.
+\newpage
+
+Pese a las ventajas y la relativa popularidad de los procesadores paralelos, siguen atados a las mismas leyes físicas que los procesadores de un solo núcleo.
+La cantidad de energía que puede ser suministrada a los procesadores es limitada, y aunque pudiéramos obviar este dato, la temperatura que generarían el procesador derretiría la base de silicio que lo compone.
+Además de afrontar los otros problemas que conlleva tener un sistema paralelo, como lo son la sincronicidad de la memoria, el ancho de banda, el coste energético asociado a mover información de un núcleo a otro, entre otros. Estos son problemas que aun a día de hoy se sigue investigando.
+\bigskip
+
+Ahora me gustaría detenerme a explicar la Escala de Dennard, ya que se menciona en repetidas ocasiones que hay un límite físico, pero no se explica ni se menciona porqué. La Escala de Dennard es una ley relacionada con la Ley de Moore, que dice que conforme los transistores reducen su tamaño, su consumo energético disminuye en la misma proporción.
+Lo cual era un gran ventaja porque en tanto se reducía el tamaño de la fotolitografía, la potencia de los procesadores aumentaba. Pero con el tiempo el avance tecnológico se acercaba a la barrera de los pocos nanómetros. Y se vio que cuando los transistores alcanzaban tamaños minúsculos, el voltaje umbral para activarlos disminuía también, hasta el punto de que empezaba a ser un problema porque se generaban fugas y diversos problemas de difícil o imposible solución.
+Por ese motivo el voltaje se ha mantenido relativamente constante con los años, aunque la cantidad de transistores haya aumentado exponencialmente. La eficiencia energética perdura como uno de los principales focos de investigación, las maquinas que más se benefician del aumento de la eficiencia son los sistemas embebidos y los superordenadores, unos porque no disponen de energía suficiente y otros porque requieren tanta cantidad que extrae una parte de los presupuestos en costear la electricidad que alimenta y refrigera los sistemas. 
+\smallskip
+
+Retomando el artículo, una de las motivaciones era conseguir traspasar el umbral de una exaoperacion por segundo ($10^{18}$). Y entre las principales incógnitas era como alcanzar la eficiencia energética suficiente para permitir la existencia de tal sistema.
+Posibles propuestas que se estaban explorando eran mejorar el empaquetado, conseguir que la unidad funcional y la memoria estuviesen tan cerca como fuese posible reduciendo coste energético y aumentando la eficiencia, para minimizar la distancia al procesador y mantener la capacidad de almacenamiento se experimentó con memoria tridimensional, en la práctica son muchas hojas de memoria apiladas e interconectadas, permitiendo el crecimiento en vertical y aumentando la densidad de memoria. Hoy en día una técnica común de aumentar el tamaño de las memorias caches.
+Otra de las propuestas era la heterogeneidad de los sistemas, es decir conseguir un sistema con varias partes funcionales que doten al programador de herramientas para optimizar él mismo su propio código. Otro de los grandes aciertos del artículo, arquitecturas modernas basan si filosofía en este mismo principio, ARM se ha sobrepuesto en el ámbito de los ordenadores portátiles por la sencilla razón de que la mayoría de usuarios no harán un uso intensivo del procesador, y se limitaran a tareas sencillas que no requieren de mucha capacidad de cómputo. Es por eso que ARM se compone de núcleos de alto rendimiento y de alto consumo. Usualmente más núcleos de alto rendimiento. Apagando los núcleos que no necesita para la ejecución de sus tareas, ahorrando mucha energía, permitiendo crear sistemas ultra eficientes con la capacidad de funcionar bien bajo estrés cuando sea necesario. ARM no es una arquitectura nueva, pero su popularidad reciente es un recordatorio del acierto de predicción del artículo.
+
+\medskip
+
+El proyecto ECHELON de Nvidia, desarrollo una arquitectura experimental, que no se materializo comercialmente, pero que sentó las bases para el devenir de las arquitectura de procesadores.
+Pensado como proceso de 10 nm, quería unificar la GPU y la CPU, para maximizar las sinergias de ambas. Con una memoria unificada, eliminando duplicidades de código y los tiempos de espera en los que la información tiene que propagarse por los buses de una memoria a otra. Y facilitando la tarea del programador a no tener que manejar varias memoria.
+
+\medskip
+
+Cada chip de la arquitectura Echelon, contenía 64 placas o láminas de alto rendimiento, 8 de bajo consumo, 16 controladores de DRAM y un chip de red pensado para unir y conectar las láminas y la memoria. Esta arquitectura permitía la máxima eficiencia energética, múltiples niveles de localidad de memoria y una implementación eficiente de paralelismo a nivel de instrucción y de datos.
+Ser técnico no es el objetivo de la memoria puesto que son conceptos complicados, pero básicamente está describiendo lo que ahora llamamos SoC (System-On-a-Chip), donde tenemos distintos segmentos o zonas encargadas de distintas tareas. Otras mejoras como un repertorio de instrucciones amplio y variado, registros especiales y un planificador de tareas mejorado conforman la arquitectura del pasado que ha moldeado el futuro.
+
+\bigskip
+
+A modo de curiosidad, he mencionado en reiteradas ocasiones que el nombre de la arquitectura es Echelon, que curiosamente coincide con el nombre de la mayor red de espionaje e intercepción de telecomunicaciones de la historia.
+Que originalmente nació como una red de inteligencia cooperativa, entre Estados Unidos y Reino Unido, para vigilar a la Unión Soviética pero ahora tienen objetivos más globales. Para buscar información sobre la arquitectura, procurar especificar a los motores de búsqueda con palabras como Nvidia o arquitectura.
+
+\section{Referencias}
+
+\begin{tcolorbox}[
+    blanker,
+    left=12pt, right=12pt,
+    top=8pt, bottom=8pt,
+    before skip=10pt, after skip=10pt
+]
+\small
+Schieffer, G., Wahlgren, J., Ren, J., Faj, J., \& Peng, I. (2024, August). \emph{Harnessing integrated cpu-gpu system memory for hpc: a first look into Grace Hopper}. In Proceedings of the 53rd International Conference on Parallel Processing (pp. 199--209).
+\end{tcolorbox}
+
+Grace Hopper, ilustre científica, madre de la computación, contraalmirante de la armada estadounidense, creadora de COBOL.
+Una gran figura que merece una sección propia. Pero la referencia es solo el nombre comercial con el que Nvidia vende su sistema todo en uno, preparado para la inferencia y el entrenamiento de la IA, en un mismo chip.
+El sistema se compone de una CPU ARM y una GPU H100 de Nvidia, con un protocolo propietario de interconexión llamado NVLink-C2C, permitiendo que la CPU lea directamente de la GPU y viceversa, además de asegurarse de mantener la coherencia de la informacion.
+Básicamente es memoria no unificada que actúa (se simula mediante buses ultra rapidos) como una memoria UMA
+El Articulo original del 2010, menciona como la memoria unificada será una ventaja de las arquitecturas del futuro, y aquí la misma Nvidia intentar emular por hardware una memoria compartida.
+
+\bigskip
+
+\begin{tcolorbox}[
+    blanker,
+    left=12pt, right=12pt,
+    top=8pt, bottom=8pt,
+    before skip=10pt, after skip=10pt
+]
+\small
+Hübner, P., Hu, A., Peng, I., \& Markidis, S. (2025, June). \emph{Apple vs. Oranges: Evaluating the apple silicon m-series socs for hpc performance and efficiency.} In 2025 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW) (pp. 45-54). IEEE.
+\end{tcolorbox}
+
+Siguiendo el hilo de la anterior referencia, la arquitectura Apple ARM, ha demostrado capacidades de escalabilidad al nivel de los Centro de Datos de la nube.
+La memoria unificada del SoC y el ancho de banda alcanzan en distintas pruebas niveles asombrosos.
+La eficiencia de los núcleos también es de notar. La memoria está dentro del mismo silicio, por tanto retoma el topico del SoC (o NoC que hablaba el autor del artículo de 2010)
+Además de que la arquitectura ARM permite la heterogeneidad de los procesadores. 
+
+\bigskip
+
+\begin{tcolorbox}[
+    blanker,
+    left=12pt, right=12pt,
+    top=8pt, bottom=8pt,
+    before skip=10pt, after skip=10pt
+]
+\small
+Guo, Q., Alachiotis, N., Akin, B., Sadi, F., Xu, G., Low, T. M., ... \& Franchetti, F. (2014). \emph{3D-stacked memory-side acceleration: Accelerator and system design.} In 2nd Workshop on Near Data Processing, WONDP 2014. IEEE.
+\end{tcolorbox}
+
+El escalado de Dennard, provoco el silicio oscuro, un fenómeno en el que solo una parte de los transistores se pueden encender sin arriesgarse a problemas serios.
+Justamente habla sobre apilar memoria en vertical hasta alcanzar el límite económico o la altura deseada.
+Este articulo también confirma que el mayor gasto energético ocurre al mover archivos innecesariamente.
+Mover datos dentro de la pila 3D gasta apenas 5,6 pJ/bit, mientras que sacarlos fuera al procesador cuesta más del doble (12 pJ/bit)
+Echelon predijo que el futuro pasaba por módulos con multiples unidades funcionales con memoria tridimensional conectada.
+% Capítulo 3
+\chapter{Conclusión}
+\label{cap:conclusion}
+Echelon y los ingenieros de Nvidia plasmaron en un articulo que eran capaces de visualizar exactamente cuales eran los problemas de los sistemas paralelizados y las posibles soluciones que hay a dichos problemas.
+
+\smallskip
+
+De manera casi secundaria, menciono la arquitectura ARM, que ha arrasado el mercado de los ordenadores portátiles y que hace años que se impuso en los teléfonos móviles. ARM aunque ha cambiado mucho desde su nacimiento como idea teórica, es la prueba de que la programación paralela y las arquitecturas capaces de sobreponerse a los problemas inherentes de la paralelización serán la referencia para la industria de la informática.
+
+
+% --------------------------------------------------
+% BIBLIOGRAFÍA
+% --------------------------------------------------
+\clearemptydoublepage
+\printbibliography[heading=bibintoc, title={Bibliografía}]
+
+% --------------------------------------------------
+% ANEXOS (Opcional)
+% --------------------------------------------------
+
+\end{document}
