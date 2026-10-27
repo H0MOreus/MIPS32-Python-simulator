@@ -117,7 +117,7 @@ class EX_MEM_Register(PipelineRegister):
             "alu_zero": 0,                # Bandera Zero de la ALU (saltos)
             "alu_result": 0x00000000,     # Salida de la ALU
             "write_data": 0x00000000,     # Valor de rt (con forwarding aplicado) para 'sw'
-            "rd": 0,                      # Registro destino
+            "write_reg": 0,
         }
 
 
@@ -132,6 +132,5 @@ class MEM_WB_Register(PipelineRegister):
             "read_data": 0x00000000,
             "mem_read_data": 0x00000000,        # Palabra de .data en 'lw'
             "alu_result": 0x00000000,       # Resultado de la ALU adelantado hacia WB
-            "rd": 0,
             "write_reg": 0,                        # registro destino
         }

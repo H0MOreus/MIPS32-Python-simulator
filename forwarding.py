@@ -12,7 +12,7 @@ class ForwardingUnit:
       - wb_write_reg   : Registro destino (0..31) retenido de WB en el Paso 1 (I1).
       - wb_write_data 
     """
-    
+
     NO_FORWARD  = 0b00  
     FROM_MEM_WB = 0b01  
     FROM_EX_MEM = 0b10  
@@ -119,9 +119,9 @@ class HazardDetectionUnit:
         self.id_ex_flush = False
         self.load_use_stall = False
 
-    """
-    Determina si la instruccion en EX es un 'beq' o 'bne'
-    """
+    
+   # Determina si la instruccion en EX es un 'beq' o 'bne'
+    
     @staticmethod
     def is_branch_taken_in_ex(id_ex: ID_EX_Register, alu_zero: bool) -> bool:
         
@@ -131,9 +131,9 @@ class HazardDetectionUnit:
         take_bne = (id_ex.control.get("BranchNe", 0) == 1) and (not alu_zero)
         return take_beq or take_bne
 
-    """
-    Return: (lee_rs, lee_rt, num_rs, num_rt)
-    """
+    
+    # Return: (lee_rs, lee_rt, num_rs, num_rt)
+    
     @staticmethod
     def _get_read_registers_in_id(instr: int) -> Tuple[bool, bool, int, int]:
         if instr == 0x00000000:
@@ -167,9 +167,9 @@ class HazardDetectionUnit:
         return True, True, rs, rt
 
 
-    """
-    Si la instruccion anterior es 'lw', se compara el rd de I-1 con el rs/rt de I
-    """
+    
+   # Si la instruccion anterior es 'lw', se compara el rd de I-1 con el rs/rt de I
+    
     def detect_load_use(
         self,
         if_id: IF_ID_Register,

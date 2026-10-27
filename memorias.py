@@ -44,18 +44,23 @@ class Memory:
         # alineamiento palabra, y HF
         if size == 4 and (addr & 0x3) != 0:
             raise AlignmentError(f"Alignment Exception W in Dir 0x{addr:08x}")
+        
         if size == 2 and (addr & 0x1) != 0:
-            raise AlignmentError(f"Alignment Exception HW in Dir 0x{addr:08x}")
+            raise AlignmentError(f"Alignment Exception HW in Dir 0x{addr:08x}") # no uso halfs pero si bytes
+        
         # pertenece a la seccion de texto
         if self.TEXT_BASE <= addr and (addr+size) <= (self.TEXT_BASE + self.TEXT_SIZE):
             if w and self.strict_text_protection:
                 raise SegmentationFault(f"Segmentation Fault in 0x{addr:08x}, permision denied")
             return self._text, addr-self.TEXT_BASE
+        
         if isIF:
             raise SegmentationFault(f"PC out of range: Dir 0x{addr:08x}")
         # pertenece a la seccion de data
+
         if self.DATA_BASE <= addr and (addr+size) <= (self.DATA_SIZE + self.DATA_BASE):
             return self._data, addr-self.DATA_BASE
+        
         # no pertenece a nada
         raise SegmentationFault(
             f"Segmentation Fault: Dir 0x{addr:08X} (size {size}B)"
@@ -65,7 +70,7 @@ class Memory:
     def fetch_instruction(self, pc: int)->int:
         buff, offset = self._tAddr(pc, size=4, w=False, isIF=True)
         (inst,) = struct.unpack_from(">I", buff, offset)
-        # variable anonima, como guardo bytes,  uso > para Big Endian, I para enteros U.
+        # Solo contiene bytes, como guardo bytes,  uso > para Big Endian, I para enteros U.
         # deberia de haber un explicacion detallada... somewhere
         return inst
 
@@ -78,7 +83,7 @@ class Memory:
         buff, offset = self._tAddr(dir, size=4, w=True)
         struct.pack_into(">I", buff, offset, to_unsigned32(x))
 
-    # el codigo queda preparado, no testeado
+    # el codigo queda preparado, no testeado, no ncesario
     # def read_half(self, dir: int, signed: bool = True) -> int:
     #     buff, offset = self._tAddr(dir, size=2, w=False)
     #     formatt: str = ">h" if signed else ">H"
@@ -115,7 +120,7 @@ class Memory:
         addr = to_unsigned32(base_address)
         end = addr + len(raw_bytes)
         if not (self.DATA_BASE <= addr and end <= (self.DATA_BASE + self.DATA_SIZE)):
-            raise SegmentationFault("Overflow .data.")
+            raise SegmentationFault("Overflow while trying to read from  .data.")
         offset = addr - self.DATA_BASE
         self._data[offset : offset + len(raw_bytes)] = raw_bytes
 

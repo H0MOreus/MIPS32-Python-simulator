@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 from ensamblador import MIPS32Assembler, AssemblerSyntaxError
-from segmentacion import MIPS32PipelineCPU
+from segmentacion import Segmentacion
 from memorias import Memory, HarwareMemException, AlignmentError, SegmentationFault
 
 DEFAULT_CANDIDATE_PATHS = [
@@ -63,7 +63,7 @@ def main() -> int:
         print(f"[ERROR DE ENSAMBLADO] {err}", file=sys.stderr)
         return 1
 
-    cpu = MIPS32PipelineCPU()
+    cpu = Segmentacion()
     cpu.load_program(
         machine_words=machine_words,
         base_address=Memory.TEXT_BASE,

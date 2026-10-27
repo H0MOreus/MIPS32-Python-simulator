@@ -68,7 +68,7 @@ class ControlUnit:
                     "MemtoReg": 0,
                     "RegWrite": 1,
                     "ALUOp": 0b10,
-                })
+                })                                      
         elif opcode in (cls.OP_ADDI, cls.OP_ADDIU):
             signals.update({"RegDst": 0, "ALUSrc": 1, "RegWrite": 1, "ALUOp": 0b00})
         

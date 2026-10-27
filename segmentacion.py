@@ -13,10 +13,7 @@ from pipeline_regs import (
 from forwarding import ForwardingUnit, HazardDetectionUnit
 
 
-class MIPS32PipelineCPU:
-    """
-    Procesador MIPS32 segmentado de 5 etapas.
-    """
+class Segmentacion:
 
     def __init__(self) -> None:
         self.memory = Memory()
@@ -429,3 +426,8 @@ class MIPS32PipelineCPU:
             },
             "registers": self.regs.dump(cond=True),
         }
+
+
+# Alias de compatibilidad hacia atras para la suite de pruebas unitarias
+MIPS32PipelineCPU = Segmentacion
+

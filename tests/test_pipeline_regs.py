@@ -1,4 +1,10 @@
+import sys
 import unittest
+from pathlib import Path
+
+# Permite ejecutar el test directamente con 'python3 tests/test_pipeline_regs.py'
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from pipeline_regs import (
     PipelineRegister,
     IF_ID_Register,
@@ -69,14 +75,14 @@ class TestPipelineRegisters(unittest.TestCase):
     def test_ex_mem_register(self):
         reg = EX_MEM_Register()
         self.assertEqual(reg.name, "EX/MEM")
-        default_keys = ["pc", "branch_target", "alu_zero", "alu_result", "write_data", "rd"]
+        default_keys = ["pc", "branch_target", "alu_zero", "alu_result", "write_data", "write_reg"]
         for k in default_keys:
             self.assertIn(k, reg.data)
 
     def test_mem_wb_register(self):
         reg = MEM_WB_Register()
         self.assertEqual(reg.name, "MEM/WB")
-        default_keys = ["pc", "read_data", "alu_result", "rd"]
+        default_keys = ["pc", "read_data", "alu_result", "write_reg"]
         for k in default_keys:
             self.assertIn(k, reg.data)
 
